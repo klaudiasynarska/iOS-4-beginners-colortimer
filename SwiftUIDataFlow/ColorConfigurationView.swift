@@ -9,23 +9,15 @@ import SwiftUI
 
 struct ColorConfigurationView: View {
     
-//    @Binding var timeTextColor: Color
-//    @Binding var circleColor: Color
-//    @Binding var backgroundPrimaryColor: Color
-//    @Binding var backgroundSecondaryColor: Color\
-    
     @Binding var colors: [ConfigItem: Color]
-    
     @Binding var selectedItem: ConfigItem
-
-//    @State private var selectedItem = ConfigItem.timeText
 	
 	var body: some View {
-		Picker("Pick item to configure", selection: $selectedItem) { // TODO: pass selection state
+		Picker("Pick item to configure", selection: $selectedItem) {
 			ForEach(ConfigItem.allCases, id: \.self) { config in
 				ColorConfigurationView.ConfigurationRow(
 					config: config,
-                    value: colors[config] ?? .black // TODO: Pass this data
+                    value: colors[config] ?? .black
 				)
 			}
 		}

@@ -9,35 +9,37 @@ import SwiftUI
 
 struct ContentView: View {
     
-    private static let defaultColor: Color = .gray
-    
     @EnvironmentObject var timerModel: TimerModel
     
-//    @State var timeTextColor: Color = ContentView.defaultColor
-//    @State var circleColor: Color = ContentView.defaultColor
-//    @State var backgroundPrimaryColor: Color = ContentView.defaultColor
-//    @State var backgroundSecondaryColor: Color = ContentView.defaultColor
-    
     @State var colors: [ColorConfigurationView.ConfigItem: Color] = [
-        .timeText: ContentView.defaultColor,
-        .circle: ContentView.defaultColor,
-        .backgroundPrimary: ContentView.defaultColor,
-        .backgroundSecondary: ContentView.defaultColor,
+        .timeText: .black,
+        .circle: .pink,
+        .backgroundPrimary: .blue,
+        .backgroundSecondary: .green,
     ]
     
-    @State var selectedItem: ColorConfigurationView.ConfigItem = ColorConfigurationView.ConfigItem.timeText
+    @State var selectedItem: ColorConfigurationView.ConfigItem = .timeText
     
-    @State private var selectedColor = ContentView.defaultColor
+    @State private var selectedColor: Color = .white
+    @State private var timerViewBackgroundColor: Color = .white
 
 	var body: some View {
 		VStack(spacing: 0) {
-			TimerView() // TODO: Configure textColor
-                .background(Color.white.edgesIgnoringSafeArea(.top))
-            // TODO: Change color form primary to secendary on every second passed
+            TimerView(circleColor: $colors[.circle], timerColor: $colors[.timeText])
+                .onReceive(timerModel.$time, perform: { time in
+                    withAnimation(.easeInOut) {
+                        if time.timeIntervalSince1970.truncatingRemainder(dividingBy: 2) == 0 {
+                            timerViewBackgroundColor = colors[.backgroundPrimary] ?? .white
+                        } else {
+                            timerViewBackgroundColor = colors[.backgroundSecondary] ?? .white
+                        }
+                    }
+                    
+                })
+                .background(timerViewBackgroundColor.edgesIgnoringSafeArea(.top))
+
 			Form {
 				Section("Color configurator") {
-						// TODO: Pass data to
-                    
 					ColorConfigurationView(
                         colors: $colors,
                         selectedItem: $selectedItem
@@ -51,7 +53,6 @@ struct ContentView: View {
 				}
 				Button("Start the count!") {
                     timerModel.start()
-                    // TODO: Start the count here
 				}
 				.buttonStyle(.borderless)
 			}

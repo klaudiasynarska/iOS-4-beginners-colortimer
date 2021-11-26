@@ -8,32 +8,39 @@
 import SwiftUI
 
 struct TimerView: View {
-    
-    // TODO: Consider changing to time only
+
     @EnvironmentObject var timerModel: TimerModel
+    
+    @Binding var circleColor: Color?
+    @Binding var timerColor: Color?
 
 	var body: some View {
 		VStack(spacing: 16) {
-            Text((timerModel.referenceTime..<timerModel.time).formatted(.timeDuration)) // TODO: Take dates form TimeModel
+            Text((timerModel.referenceTime..<timerModel.time).formatted(.timeDuration))
 				.font(.largeTitle)
+                .foregroundColor(timerColor)
 				.padding(44)
-				.background(Circle().stroke(Color.orange, lineWidth: 6)) //TODO: Pass circle color
+                .background(Circle().stroke(circleColor ?? .white, lineWidth: 6))
 				.padding(.top, 48)
-              // TODO: Bind timer value with TimeInterval
             
-            
-            Stepper("Set Timer", value: .constant(TimeInterval(60)), step: 1)
-                
-//                .onChange(of: <#T##Equatable#>, perform: <#T##(Equatable) -> Void##(Equatable) -> Void##(_ newValue: Equatable) -> Void#>)
-                
-        
-                .padding(24)
+            Stepper(
+                "Set Timer",
+                value: Binding<TimeInterval>(
+                    get: {
+                        timerModel.time.timeIntervalSince1970
+                    }, set: { value in
+                        guard value >= 0 else { return }
+                        timerModel.time = Date(timeIntervalSince1970: value)
+                    }
+                ),
+                step: TimeInterval(1)
+            ).padding(24)
 		}
 	}
 }
 
 struct TimerView_Previews: PreviewProvider {
     static var previews: some View {
-        TimerView()
+        TimerView(circleColor: .constant(.red), timerColor: .constant(.blue))
     }
 }
